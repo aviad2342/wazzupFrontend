@@ -23,6 +23,7 @@
         // height: calc(100% - 22px);
         text-align: left;
         min-width: 210px;
+        overflow-y: scroll;
     }
 
     .contact-item {
@@ -72,6 +73,7 @@
             align-self: stretch;
             height: 100%;
             text-align: center;
+            overflow-y: scroll;
         }
 
         .messages-input {

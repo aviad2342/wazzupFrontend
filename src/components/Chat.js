@@ -1,17 +1,24 @@
 import React, { useCallback, useEffect, useState } from "react";
-// import socketClient from "socket.io-client";
+import socketClient from "socket.io-client";
+// import { io } from "socket.io-client";
 import ContactsList from "./ContactsList";
 import MessagesPanel from "./MessagesPanel";
 import Header from './Layout/Header'
 import ContactsListHeader from './Layout/ContactsListHeader'
 import './chat.scss';
-// const SERVER = "http://127.0.0.1:8080";
+const SERVER = "http://127.0.0.1:8000";
 
 const Chat = (props) => {
 
     const [contacts, setContacts] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [response, setResponse] = useState(null);
+
+    // const socket = io(SERVER);
+    // socket.on("connect", () => {
+    //   console.log(socket.id);
+    // });
 
     const fetchContactsHandler = useCallback(async () => {
     setIsLoading(true);
@@ -38,11 +45,48 @@ const Chat = (props) => {
     }
     setIsLoading(false);
   }, []);
+  const socket = socketClient(SERVER);
+
+  const configureSocket = useCallback(async () => {
+    socket.on("connection", () => {
+      // this.socket.emit('data', 2, ack => {
+      //   console.log(ack);
+      // });
+    });
+    socket.on("client", res => {
+      setResponse(res);
+      console.log(response);
+  });
+  }, [socket]);
 
 
   useEffect(() => {
     fetchContactsHandler();
   }, [fetchContactsHandler]);
+
+  // useEffect(() => {
+  //   const socket = socketClient(SERVER);
+  //   socket.on("connection", () => {
+  //     this.socket.emit('data', 2, ack => {
+  //       console.log(ack);
+  //     });
+  //   });
+  //   socket.on("client", response => {
+  //     console.log(response);
+  // });
+
+
+  //   return () => socket.disconnect();
+  // }, []);
+
+  const handleSendMessage = () => {
+    socket.emit('data', 5);
+}
+
+  useEffect(() => {
+    configureSocket();
+    // return () => socket.disconnect();
+  }, [configureSocket,socket]);
 
   let content = <p>Found no movies.</p>;
 
@@ -136,6 +180,7 @@ const Chat = (props) => {
 
   return (
     <div className="chat-app">
+      <button onClick={handleSendMessage} />
         <div className="contacts-list">
             <ContactsListHeader />
             {content}
