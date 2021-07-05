@@ -3,7 +3,7 @@
     top: 0;
     left: 0;
     width: auto;
-    background-color: aliceblue;
+    background-color: rgb(230, 230, 230);
     color: black;
     display: flex;
     justify-content: space-between;
@@ -33,4 +33,14 @@
     height: 100%;
     object-fit: cover;
     transform: rotateZ(-5deg) translateY(-4rem) translateX(-1rem);
+  }
+
+  .logout-btn {
+    border-radius: 5px;
+    font-family: revert;
+    font-weight: bold;
+    font-size: medium;
+    background-color: rgb(255, 31, 31);
+    width: 80px;
+    height: 30px;
   }

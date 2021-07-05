@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useHistory } from "react-router";
 import socketClient from "socket.io-client";
 // import { io } from "socket.io-client";
 import ContactsList from "./ContactsList";
@@ -10,6 +11,7 @@ const SERVER = "http://127.0.0.1:8000";
 
 const Chat = (props) => {
 
+    const history = useHistory();
     const [contacts, setContacts] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -20,7 +22,32 @@ const Chat = (props) => {
     //   console.log(socket.id);
     // });
 
-    const fetchContactsHandler = useCallback(async () => {
+  //   const fetchContact = () => {
+  //     setIsLoading(true);
+  //     setError(null);
+  //     fetch('https://swapi.dev/api/films/').then( (response) => {
+  //       return response.json();
+  //     }).then((data) => {
+  //       const transformedContacts = data.results.map((contactsData) => {
+  //         return {
+  //           id: contactsData.episode_id,
+  //           title: contactsData.title,
+  //           openingText: contactsData.opening_crawl,
+  //           releaseDate: contactsData.release_date,
+  //         };
+  //       });
+  //       setContacts(transformedContacts);
+
+  //     }).catch( (error) => {
+  //       setError(error);
+
+  //     }).finally(() => {
+  //       setIsLoading(false);
+
+  //     });
+  // };
+
+  const fetchContactsHandler = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -45,6 +72,7 @@ const Chat = (props) => {
     }
     setIsLoading(false);
   }, []);
+
   const socket = socketClient(SERVER);
 
   const configureSocket = useCallback(async () => {
@@ -57,8 +85,13 @@ const Chat = (props) => {
       setResponse(res);
       console.log(response);
   });
-  }, [socket]);
+  }, [socket, response]);
 
+
+  // useEffect(() => {
+  //   console.log('hi');
+  //   fetchContact();
+  // }, []);
 
   useEffect(() => {
     fetchContactsHandler();
@@ -79,8 +112,14 @@ const Chat = (props) => {
   //   return () => socket.disconnect();
   // }, []);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = (newMessage) => {
     socket.emit('data', 5);
+    contacts.push(newMessage);
+}
+
+const logoutHandler= () => {
+  console.log('fff');
+  history.replace('/auth');
 }
 
   useEffect(() => {
@@ -180,14 +219,14 @@ const Chat = (props) => {
 
   return (
     <div className="chat-app">
-      <button onClick={handleSendMessage} />
+      {false && <button onClick={handleSendMessage} />}
         <div className="contacts-list">
-            <ContactsListHeader />
+            <ContactsListHeader onLogout={logoutHandler} />
             {content}
         </div>
         <div className="messages-section">
         <Header />
-        <MessagesPanel messages={contacts}/>
+        <MessagesPanel messages={contacts} onNewMessage={handleSendMessage}/>
         </div>
       {/* <ChannelList channels={channels} onSelectChannel={handleChannelSelect} />
                 <MessagesPanel onSendMessage={handleSendMessage} channel={channel} /> */}
