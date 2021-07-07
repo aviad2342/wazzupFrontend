@@ -3,7 +3,7 @@ import "./App.css";
 import "./App.scss";
 import React, { useContext } from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
-import Chat from "./components/Chat";
+import Chat from "./components/chat/Chat";
 import Auth from "./components/Auth";
 import AuthContext from "./store/auth-context";
 
@@ -16,7 +16,10 @@ function App() {
         <Route path="/" exact>
           <Redirect to="/chat" />
         </Route>
-        {!authCtx.isLoggedIn && (
+        <Route path="/chat">
+          <Chat />
+        </Route>
+        {/* {!authCtx.isLoggedIn && (
           <Route path="/auth">
             <Auth />
           </Route>
@@ -27,7 +30,7 @@ function App() {
         </Route>
         <Route path="*">
           <Redirect to="/" />
-        </Route>
+        </Route> */}
       </Switch>
     </div>
   );

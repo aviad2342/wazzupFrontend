@@ -32,7 +32,7 @@
         padding: 4px;
         display: inline-flex;
         width: 96%;
-        text-align: center;
+        text-align: left;
 
         div {
             align-self: center;
@@ -71,13 +71,30 @@
         -webkit-transition: all 300ms ease;
       }
     
+    .contact-details {
+        display: block;
+        padding-left: 15px;
+    }  
+
     .contact-avatar {
         width: 45px;
+        min-width: 45px;
         height: 45px;
+        min-height: 45px;
         border-radius: 34px;
         z-index: 0;
         overflow: hidden;
     }
+
+    .contact-name {
+        font-size: medium;
+    }
+
+    .contact-last {
+        font-size: small;
+        margin: 2px;
+    }
+
     .messages-section {
         // width: calc(75% - 12px);
         width: 70%;

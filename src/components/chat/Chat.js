@@ -1,13 +1,69 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import socketClient from "socket.io-client";
 // import { io } from "socket.io-client";
-import ContactsList from "./ContactsList";
-import MessagesPanel from "./MessagesPanel";
-import Header from './Layout/Header'
-import ContactsListHeader from './Layout/ContactsListHeader'
+import ContactsList from "./contacts-list/ContactsList";
+import Conversation from "./conversation/Conversation";
+import Header from './Header'
+import ContactsListHeader from './contacts-list/ContactsListHeader'
 import './chat.scss';
-import AuthContext from '../store/auth-context';
+import AuthContext from '../../store/auth-context';
 const SERVER = "http://127.0.0.1:8000";
+
+const DUMMY_CONVERSATIONS = [
+  {
+    _id: 'dsfnsdjnjksdnfjkl324234',
+    id: "05253718040523698741",
+    users: [{id: "0525371804", name: "Aviad ben hayun", avatar: 'https://www.pngkey.com/png/detail/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png'},
+     {id: "0523698741", name: "Mor shimoni", avatar: 'https://www.winhelponline.com/blog/wp-content/uploads/2017/12/user.png'}],
+    messages: [
+      {from: '0525371804', date:'2021-07-07T16:22:04.615Z' , body: 'Hey, check out this Pure CSS speech bubble'},
+      {from: '0523698741', date:'2021-07-07T16:23:04.615Z' , body: 'Nice... this will work great for my new project.'},
+      {from: '0525371804', date:'2021-07-07T16:23:03.615Z' , body: 'Hey, asdfsdfsd sgdfged hdfh '},
+      {from: '0525371804', date:'2021-07-07T16:23:04.615Z' , body: 'Hey, sh hsghsghsg s sjjs ff '},
+      {from: '0523698741', date:'2021-07-07T16:25:04.615Z' , body: 'Hey,  hfdjhjghjkjhkhjkhkghk'}
+    ]
+    
+  },
+  {
+    _id: 'dsfnsdjnjksdnfjkl324234',
+    id: "052369874120523698745",
+    users: [{id: "0525371804", name: "Aviad ben hayun", avatar: 'https://www.pngkey.com/png/detail/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png'},
+     {id: "0523698741", name: "Mor shimoni", avatar: 'https://www.winhelponline.com/blog/wp-content/uploads/2017/12/user.png'}],
+    messages: [
+      {from: '0525371804', date:'2021-07-07T16:22:04.615Z' , body: 'Hey, check out this Pure CSS speech bubble'},
+      {from: '0523698741', date:'2021-07-07T16:23:04.615Z' , body: 'Nice... this will work great for my new project.'},
+      {from: '0525371804', date:'2021-07-07T16:23:03.615Z' , body: 'Hey, asdfsdfsd sgdfged hdfh '},
+      {from: '0525371804', date:'2021-07-07T16:23:04.615Z' , body: 'Hey, sh hsghsghsg s sjjs ff '},
+      {from: '0523698741', date:'2021-07-07T16:25:04.615Z' , body: 'Hey,  hfdjhjghjkjhkhjkhkghk'}
+    ]
+  },
+  {
+    _id: 'dsfnsdjnjksdnfjkl324234',
+    id: "05253718040523698745",
+    users: [{id: "0525371804", name: "Aviad ben hayun", avatar: 'https://www.pngkey.com/png/detail/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png'},
+     {id: "0523698741", name: "Mor shimoni", avatar: 'https://www.winhelponline.com/blog/wp-content/uploads/2017/12/user.png'}],
+    messages: [
+      {from: '0525371804', date:'2021-07-07T16:22:04.615Z' , body: 'Hey, check out this Pure CSS speech bubble'},
+      {from: '0523698741', date:'2021-07-07T16:23:04.615Z' , body: 'Nice... this will work great for my new project.'},
+      {from: '0525371804', date:'2021-07-07T16:23:03.615Z' , body: 'Hey, asdfsdfsd sgdfged hdfh '},
+      {from: '0525371804', date:'2021-07-07T16:23:04.615Z' , body: 'Hey, sh hsghsghsg s sjjs ff '},
+      {from: '0523698741', date:'2021-07-07T16:25:04.615Z' , body: 'Hey,  hfdjhjghjkjhkhjkhkghk'}
+    ]
+  },
+  {
+    _id: 'dsfnsdjnjksdnfjkl324234',
+    id: "05253945870523698745",
+    users: [{id: "0525371804", name: "Aviad ben hayun", avatar: 'https://www.pngkey.com/png/detail/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png'},
+     {id: "0523698741", name: "Mor shimoni", avatar: 'https://www.winhelponline.com/blog/wp-content/uploads/2017/12/user.png'}],
+    messages: [
+      {from: '0525371804', date:'2021-07-07T16:22:04.615Z' , body: 'Hey, check out this Pure CSS speech bubble'},
+      {from: '0523698741', date:'2021-07-07T16:23:04.615Z' , body: 'Nice... this will work great for my new project.'},
+      {from: '0525371804', date:'2021-07-07T16:23:03.615Z' , body: 'Hey, asdfsdfsd sgdfged hdfh '},
+      {from: '0525371804', date:'2021-07-07T16:23:04.615Z' , body: 'Hey, sh hsghsghsg s sjjs ff '},
+      {from: '0523698741', date:'2021-07-07T16:25:04.615Z' , body: 'Hey,  hfdjhjghjkjhkhjkhkghk'}
+    ]
+  },
+];
 
 const Chat = (props) => {
 
@@ -75,19 +131,19 @@ const Chat = (props) => {
     setIsLoading(false);
   }, []);
 
-  const socket = socketClient(SERVER);
+  // const socket = socketClient(SERVER);
 
-  const configureSocket = useCallback(async () => {
-    socket.on("connection", () => {
-      // this.socket.emit('data', 2, ack => {
-      //   console.log(ack);
-      // });
-    });
-    socket.on("client", res => {
-      setResponse(res);
-      console.log(response);
-  });
-  }, [socket, response]);
+  // const configureSocket = useCallback(async () => {
+  //   socket.on("connection", () => {
+  //     // this.socket.emit('data', 2, ack => {
+  //     //   console.log(ack);
+  //     // });
+  //   });
+  //   socket.on("client", res => {
+  //     setResponse(res);
+  //     console.log(response);
+  // });
+  // }, [socket, response]);
 
 
   // useEffect(() => {
@@ -114,20 +170,20 @@ const Chat = (props) => {
   //   return () => socket.disconnect();
   // }, []);
 
-  const handleSendMessage = (newMessage) => {
-    socket.emit('data', 5);
-    contacts.push(newMessage);
-}
+//   const handleSendMessage = (newMessage) => {
+//     socket.emit('data', 5);
+//     contacts.push(newMessage);
+// }
 
 const logoutHandler= () => {
   authCtx.logout();
   // history.replace('/auth');
 }
 
-  useEffect(() => {
-    configureSocket();
-    // return () => socket.disconnect();
-  }, [configureSocket,socket]);
+  // useEffect(() => {
+  //   configureSocket();
+  //   return () => socket.disconnect();
+  // }, [configureSocket,socket]);
 
   let content = <p>No contacts Found.</p>;
 
@@ -221,14 +277,15 @@ const logoutHandler= () => {
 
   return (
     <div className="chat-app">
-      {false && <button onClick={handleSendMessage} />}
+      {/* {false && <button onClick={handleSendMessage} />} */}
         <div className="contacts-list">
             <ContactsListHeader onLogout={logoutHandler} />
             {content}
         </div>
         <div className="messages-section">
         <Header />
-        <MessagesPanel messages={contacts} onNewMessage={handleSendMessage}/>
+        <Conversation conversation={DUMMY_CONVERSATIONS.find(c => c.id === '05253718040523698741')} />
+        {/* <MessagesPanel messages={contacts} onNewMessage={handleSendMessage}/> */}
         </div>
       {/* <ChannelList channels={channels} onSelectChannel={handleChannelSelect} />
                 <MessagesPanel onSendMessage={handleSendMessage} channel={channel} /> */}
