@@ -1,8 +1,8 @@
-import { useState, useRef, useContext } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useState, useRef, useContext } from "react";
+import { useHistory } from "react-router-dom";
 
-import AuthContext from '../store/auth-context';
-import classes from './AuthForm.module.css';
+import AuthContext from "../store/auth-context";
+import classes from "./AuthForm.module.css";
 
 const Auth = (props) => {
   const history = useHistory();
@@ -15,22 +15,22 @@ const Auth = (props) => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-
-    const enteredEmail = phoneInputRef.current.value;
-    const enteredPassword = nameInputRef.current.value;
+    
+    const enteredPhone = phoneInputRef.current.value;
+    const enteredName = nameInputRef.current.value;
 
     // optional: Add validation
 
     setIsLoading(true);
-    
-    fetch('http://localhost:8000/api/auth/login', {
-      method: 'POST',
+
+    fetch("http://localhost:8000/api/auth/login", {
+      method: "POST",
       body: JSON.stringify({
-        email: enteredEmail,
-        password: enteredPassword,
+        phone: enteredPhone,
+        name: enteredName,
       }),
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     })
       .then((res) => {
@@ -39,7 +39,7 @@ const Auth = (props) => {
           return res.json();
         } else {
           return res.json().then((data) => {
-            let errorMessage = 'Authentication failed!';
+            let errorMessage = "Authentication failed!";
             // if (data && data.error && data.error.message) {
             //   errorMessage = data.error.message;
             // }
@@ -49,14 +49,22 @@ const Auth = (props) => {
         }
       })
       .then((data) => {
-        const expirationTime = new Date(
-          new Date().getTime() + +data.expiresIn * 1000
+        
+        const expirationTime = new Date(new Date().getTime() + (+data.expiresIn * 1000));
+        
+        authCtx.login(
+          data.token,
+          expirationTime.toISOString(),
+          data.id,
+          data.phone,
+          data.name,
+          data.userImage,
+          data.is_active
         );
-        authCtx.login(data.idToken, expirationTime.toISOString(), data.id, data.phone, data.name, data.userImage, data.is_active);
-        history.replace('/chat');
+        history.replace("/chat");
       })
       .catch((err) => {
-        alert(err.message);
+        alert('auth' + err.message);
       });
   };
 
@@ -65,21 +73,25 @@ const Auth = (props) => {
       <h1>Login</h1>
       <form onSubmit={submitHandler}>
         <div className={classes.control}>
-          <input type='text' id='phone' required ref={phoneInputRef} placeholder="Enter phone number" />
+          <input
+            type="text"
+            id="phone"
+            required
+            ref={phoneInputRef}
+            placeholder="Enter phone number"
+          />
         </div>
         <div className={classes.control}>
           <input
-            type='text'
-            id='name'
+            type="text"
+            id="name"
             placeholder="Enter name"
             required
             ref={nameInputRef}
           />
         </div>
         <div className={classes.actions}>
-          {!isLoading && (
-            <button>Login</button>
-          )}
+          {!isLoading && <button>Login</button>}
         </div>
       </form>
     </section>

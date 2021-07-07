@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { useHistory } from "react-router";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import socketClient from "socket.io-client";
 // import { io } from "socket.io-client";
 import ContactsList from "./ContactsList";
@@ -7,11 +6,13 @@ import MessagesPanel from "./MessagesPanel";
 import Header from './Layout/Header'
 import ContactsListHeader from './Layout/ContactsListHeader'
 import './chat.scss';
+import AuthContext from '../store/auth-context';
 const SERVER = "http://127.0.0.1:8000";
 
 const Chat = (props) => {
 
-    const history = useHistory();
+  const authCtx = useContext(AuthContext);
+
     const [contacts, setContacts] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -50,6 +51,7 @@ const Chat = (props) => {
   const fetchContactsHandler = useCallback(async () => {
     setIsLoading(true);
     setError(null);
+    console.log(authCtx.name);
     try {
       const response = await fetch('https://swapi.dev/api/films/');
       if (!response.ok) {
@@ -118,8 +120,8 @@ const Chat = (props) => {
 }
 
 const logoutHandler= () => {
-  console.log('fff');
-  history.replace('/auth');
+  authCtx.logout();
+  // history.replace('/auth');
 }
 
   useEffect(() => {
@@ -127,7 +129,7 @@ const logoutHandler= () => {
     // return () => socket.disconnect();
   }, [configureSocket,socket]);
 
-  let content = <p>Found no movies.</p>;
+  let content = <p>No contacts Found.</p>;
 
   if (contacts.length > 0) {
     content = <ContactsList contacts={contacts} />;

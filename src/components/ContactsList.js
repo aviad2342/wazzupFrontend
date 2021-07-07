@@ -1,16 +1,18 @@
 
 import Contact from "./Contact";
 
-const ContactsList = (props) => {
+const ContactsList = ({contacts, selectedContactId, onSelect }) => {
 
 
   return (
     <div>
-      {props.contacts.map((contact, index) => (
+      {contacts.map((contact, index) => (
         <Contact
+        onClick={() => onSelect(contact.id)}
           key={contact.id}
           id={index}
           title={contact.title}
+          selected={selectedContactId === contact.id}
           releaseDate={contact.releaseDate}
           openingText={contact.openingText}
         />
