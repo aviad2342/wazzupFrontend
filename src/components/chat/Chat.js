@@ -287,8 +287,6 @@ const logoutHandler= () => {
         <Conversation conversation={DUMMY_CONVERSATIONS.find(c => c.id === '05253718040523698741')} />
         {/* <MessagesPanel messages={contacts} onNewMessage={handleSendMessage}/> */}
         </div>
-      {/* <ChannelList channels={channels} onSelectChannel={handleChannelSelect} />
-                <MessagesPanel onSendMessage={handleSendMessage} channel={channel} /> */}
     </div>
   );
 };

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-// import Message from "./Message";
 import Message from "./message/Message";
 import SendIcon from '../../UI/SendIcon'
 
@@ -34,16 +33,7 @@ const Conversation = (props) => {
             date={message.date}
             rigth={message.from === '0525371804'}
           />
-        )) 
-        
-        /* {props.messages.map((message) => (
-          <Message
-            key={message.id}
-            title={message.title}
-            releaseDate={message.releaseDate}
-            openingText={message.openingText}
-          />
-        ))} */}
+        )) }
       </div>
       <div className="messages-input">
         <input value={enteredMessage} onChange={typeingMessageButtonHandler} type="text" />
