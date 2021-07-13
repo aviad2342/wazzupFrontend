@@ -1,42 +1,76 @@
 
+import { useCallback, useContext, useEffect, useState } from "react";
 import Contact from "./contact/Contact";
+import AuthContext from "../../../store/auth-context";
 
-const ContactsList = ({contacts, selectedContactId, onSelect }) => {
+const ContactsList = (props) => {
 
-  const DUMMY_CONTACTS = [
-    {
-      id: "0525371804",
-      name: "Aviad ben hayun",
-      avatar: "https://www.pngkey.com/png/detail/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png",
-      lastMessage: '2021-07-07T16:25:04.615Z'
-    },
-    {
-      id: "0523698741",
-      name: "Mor shimoni",
-      avatar: 'https://www.winhelponline.com/blog/wp-content/uploads/2017/12/user.png',
-      lastMessage: '2021-07-07T16:25:04.615Z'
-    },
-    {
-      id: "0523698745",
-      name: "Avi salem",
-      avatar: "https://www.kindpng.com/picc/m/78-786207_user-avatar-png-user-avatar-icon-png-transparent.png",
-      lastMessage: '2021-07-07T16:25:04.615Z'
-    },
-    {
-      id: "0525394587",
-      name: "Dan levi",
-      avatar: "https://avatarfiles.alphacoders.com/791/79102.png",
-      lastMessage: '2021-07-07T16:25:04.615Z'
-    },
-  ];
+  const authCtx = useContext(AuthContext);
+  const [contactsList, setContactsList] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchContactsHandler = useCallback(async () => {
+    setIsLoading(true);
+    let content = <p>No contacts Found.</p>;
+    let requestBody = {
+      query: `
+      query {
+        users {
+          _id
+          phone
+          name
+          avatar
+        }
+      }
+      `
+    };
+  
+    await fetch("http://localhost:8000/graphql", {
+      method: "POST",
+      body: JSON.stringify(requestBody),
+      headers: {
+        "Content-Type": "application/json",
+      }
+    }).then((res) => {
+      content = <p>Loading...</p>;
+        setIsLoading(false);
+        if (res.ok) {
+          return res.json();
+        } else {
+          return res.json().then((data) => {
+            let errorMessage = "Failed to fetch Contacts!";
+            content = <p>{errorMessage}</p>;
+            throw new Error(errorMessage);
+          });
+        }
+      }).then((data) => {
+        setContactsList(data.data.users.filter(c => c.phone !== authCtx.phone));
+      })
+      .catch((err) => {
+        console.log('contacts ' + err.message);
+        // alert('contacts ' + err.message);
+      });
+  }, []);
+
+  useEffect(() => {
+    console.log('hi noob!');
+    fetchContactsHandler();
+    
+  }, [fetchContactsHandler]);
+
+  const contactSelectedHandler = async (id) => {
+    props.onSelect(id);
+  };
+
 
   return (
     <div>
-      {DUMMY_CONTACTS.map((contact, index) => (
+      {contactsList.map((contact, index) => (
         <Contact
-        onClick={() => onSelect(contact.id)}
-          key={contact.id}
-          id={contact.id}
+          onSelectedContact={contactSelectedHandler}
+          key={contact._id}
+          id={contact._id}
+          phone={contact.phone}
           name={contact.name}
           avatar={contact.avatar}
           lastMessage={contact.lastMessage}

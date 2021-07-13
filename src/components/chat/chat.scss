@@ -21,7 +21,7 @@
         margin-right: 0;
         // border-right: none;
         // height: calc(100% - 22px);
-        text-align: left;
+        // text-align: left;
         min-width: 210px;
         overflow-y: auto;
         overflow-x: hidden;
@@ -58,7 +58,9 @@
     }
 
     .contact-item:hover {
-        padding-right: 35px;
+        // padding-right: 35px;
+        margin-left: 28px;
+        // text-align: center;
         font-size: medium;
         border-right: none;
         -ms-transform: scale(1.2); /* IE 9 */
@@ -133,6 +135,11 @@
             border-top: 1px solid rgb(224, 224, 224);
             background-color: #f0f0f0;
             display: flex;
+
+            form {
+                width: 100%;
+                display: flex;
+            }
 
             input {
                 margin: auto;

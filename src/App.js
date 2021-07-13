@@ -14,12 +14,9 @@ function App() {
     <div className="App">
       <Switch>
         <Route path="/" exact>
-          <Redirect to="/chat" />
+          <Redirect to="/" />
         </Route>
-        <Route path="/chat">
-          <Chat />
-        </Route>
-        {/* {!authCtx.isLoggedIn && (
+        {!authCtx.isLoggedIn && (
           <Route path="/auth">
             <Auth />
           </Route>
@@ -30,7 +27,7 @@ function App() {
         </Route>
         <Route path="*">
           <Redirect to="/" />
-        </Route> */}
+        </Route>
       </Switch>
     </div>
   );

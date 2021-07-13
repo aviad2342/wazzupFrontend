@@ -8,9 +8,8 @@ const AuthContext = React.createContext({
   id: '',
   phone: '',
   name: '',
-  userImage: '',
-  is_active: false,
-  login: (token) => {},
+  avatar: '',
+  login: (token, expirationTime, id, phone, name, avatar) => {},
   logout: () => {},
 });
 
@@ -26,6 +25,10 @@ const calculateRemainingTime = (expirationTime) => {
 const retrieveStoredToken = () => {
   const storedToken = localStorage.getItem('token');
   const storedExpirationDate = localStorage.getItem('expirationTime');
+  const storedId = localStorage.getItem('id');
+  const storedPhone = localStorage.getItem('phone');
+  const storedName = localStorage.getItem('name');
+  const storedAvatar = localStorage.getItem('avatar');
 
   const remainingTime = calculateRemainingTime(storedExpirationDate);
 
@@ -38,22 +41,33 @@ const retrieveStoredToken = () => {
   return {
     token: storedToken,
     duration: remainingTime,
+    id: storedId,
+    phone: storedPhone,
+    name: storedName,
+    avatar: storedAvatar,
   };
 };
 
 export const AuthContextProvider = (props) => {
   const tokenData = retrieveStoredToken();
   let initialToken;
+  let initialId;
+  let initialPhone;
+  let initialName;
+  let initialAvatar;
   if (tokenData) {
     initialToken = tokenData.token;
+    initialId = tokenData.id;
+    initialPhone = tokenData.phone;
+    initialName = tokenData.name;
+    initialAvatar = tokenData.avatar;
   }
 
   const [token, setToken] = useState(initialToken);
-  const [id, setId] = useState('');
-  const [phone, setPhone] = useState('');
-  const [name, setName] = useState('');
-  const [userImage, setUserImage] = useState('');
-  const [is_active, setIs_Active] = useState(false);
+  const [id, setId] = useState(initialId);
+  const [phone, setPhone] = useState(initialPhone);
+  const [name, setName] = useState(initialName);
+  const [avatar, setAvatar] = useState(initialAvatar);
 
   const userIsLoggedIn = !!token;
 
@@ -61,22 +75,29 @@ export const AuthContextProvider = (props) => {
     setToken(null);
     localStorage.removeItem('token');
     localStorage.removeItem('expirationTime');
+    localStorage.removeItem('id');
+    localStorage.removeItem('phone');
+    localStorage.removeItem('name');
+    localStorage.removeItem('avatar');
 
     if (logoutTimer) {
       clearTimeout(logoutTimer);
     }
   }, []);
 
-  const loginHandler = (token, expirationTime, id, phone, name, userImage, is_active) => {
+  const loginHandler = (token, expirationTime, id, phone, name, avatar) => {
     
     setToken(token);
     setId(id);
     setPhone(phone);
     setName(name);
-    setUserImage(userImage);
-    setIs_Active(is_active);
+    setAvatar(avatar);
     localStorage.setItem('token', token);
     localStorage.setItem('expirationTime', expirationTime);
+    localStorage.setItem('id', id);
+    localStorage.setItem('phone', phone);
+    localStorage.setItem('name', name);
+    localStorage.setItem('avatar', avatar);
 
     const remainingTime = calculateRemainingTime(expirationTime);
 
@@ -96,8 +117,7 @@ export const AuthContextProvider = (props) => {
     id: id,
     phone: phone,
     name: name,
-    userImage: userImage,
-    is_active: is_active,
+    avatar: avatar,
     login: loginHandler,
     logout: logoutHandler
   };

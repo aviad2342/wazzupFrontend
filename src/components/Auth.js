@@ -23,48 +23,54 @@ const Auth = (props) => {
 
     setIsLoading(true);
 
-    fetch("http://localhost:8000/api/auth/login", {
+    let requestBody = {
+      query: `
+      query {
+        login(phone:"${enteredPhone}", userName:"${enteredName}") {
+          userId
+          phone
+          name
+          avatar
+          token
+          tokenExpiration
+        }
+      }
+      `
+    };
+
+    fetch("http://localhost:8000/graphql", {
       method: "POST",
-      body: JSON.stringify({
-        phone: enteredPhone,
-        name: enteredName,
-      }),
+      body: JSON.stringify(requestBody),
       headers: {
         "Content-Type": "application/json",
-      },
-    })
-      .then((res) => {
+      }
+    }).then((res) => {
         setIsLoading(false);
         if (res.ok) {
           return res.json();
         } else {
           return res.json().then((data) => {
             let errorMessage = "Authentication failed!";
-            // if (data && data.error && data.error.message) {
-            //   errorMessage = data.error.message;
-            // }
-
             throw new Error(errorMessage);
           });
         }
-      })
-      .then((data) => {
-        
-        const expirationTime = new Date(new Date().getTime() + (+data.expiresIn * 1000));
+      }).then((data) => {
+
+        const expirationTime = new Date(new Date().getTime() + (+data.data.login.tokenExpiration  * 1000));
         
         authCtx.login(
-          data.token,
+          data.data.login.token,
           expirationTime.toISOString(),
-          data.id,
-          data.phone,
-          data.name,
-          data.userImage,
-          data.is_active
+          data.data.login.userId,
+          data.data.login.phone,
+          data.data.login.name,
+          data.data.login.avatar
         );
         history.replace("/chat");
       })
       .catch((err) => {
-        alert('auth' + err.message);
+        // alert('auth ' + err.message);
+        console.log('auth ' + err.message);
       });
   };
 
