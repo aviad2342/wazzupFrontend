@@ -53,9 +53,7 @@ const ContactsList = (props) => {
   }, []);
 
   useEffect(() => {
-    console.log('hi noob!');
     fetchContactsHandler();
-    
   }, [fetchContactsHandler]);
 
   const contactSelectedHandler = async (id) => {

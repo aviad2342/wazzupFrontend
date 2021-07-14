@@ -6,21 +6,27 @@ import { Route, Switch, Redirect } from "react-router-dom";
 import Chat from "./components/chat/Chat";
 import Auth from "./components/Auth";
 import AuthContext from "./store/auth-context";
+import { ApolloClient, InMemoryCache, ApolloProvider, } from '@apollo/client';
 
 function App() {
   const authCtx = useContext(AuthContext);
 
+  const client = new ApolloClient({
+    uri: 'http://localhost:8000/graphql',
+    cache: new InMemoryCache()
+  });
+
   return (
+    <ApolloProvider client={client}>
     <div className="App">
       <Switch>
         <Route path="/" exact>
-          <Redirect to="/" />
+        {!authCtx.isLoggedIn &&  <Redirect to="/auth"/>}
         </Route>
-        {!authCtx.isLoggedIn && (
+        {!authCtx.isLoggedIn && 
           <Route path="/auth">
             <Auth />
-          </Route>
-        )}
+          </Route>}
         <Route path="/chat">
           {authCtx.isLoggedIn && <Chat />}
           {!authCtx.isLoggedIn && <Redirect to="/auth" />}
@@ -30,6 +36,7 @@ function App() {
         </Route>
       </Switch>
     </div>
+    </ApolloProvider>
   );
 }
 
