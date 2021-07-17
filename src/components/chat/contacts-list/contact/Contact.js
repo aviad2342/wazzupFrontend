@@ -12,7 +12,7 @@ const Contact = (props) => {
       <div className='contact-details'>
       <div className='contact-name'>{props.name}</div>
       <p className='contact-last'>
-      {moment(props.lastMessage).format('DD/MM/yy hh:mm')}</p>
+      {moment(props.lastMessage).format('DD/MM/yy')}</p>
       </div>
     </div>
   );

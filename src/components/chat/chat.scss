@@ -57,6 +57,27 @@
 
     }
 
+    .add-contact-div {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgb(199, 195, 195);
+    }
+
+    .add-contact-btn {
+        width: 98%;
+        height: 34px;
+        border-radius: 5px;
+        font-family: revert;
+        font-weight: bold;
+        font-size: medium;
+        background-color: rgb(189, 224, 189);
+
+        svg {
+            width: 31px;
+            height: 15px;
+        }
+    }
+
     .contact-item:hover {
         // padding-right: 35px;
         margin-left: 28px;
@@ -86,6 +107,8 @@
         border-radius: 34px;
         z-index: 0;
         overflow: hidden;
+        border: 1px solid black;
+        background: black;
     }
 
     .contact-name {

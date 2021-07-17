@@ -7,6 +7,7 @@ import Chat from "./components/chat/Chat";
 import Auth from "./components/Auth";
 import AuthContext from "./store/auth-context";
 import { ApolloClient, InMemoryCache, ApolloProvider, } from '@apollo/client';
+import RegisterUserForm from "./components/RegisterUserForm";
 
 function App() {
   const authCtx = useContext(AuthContext);
@@ -30,6 +31,9 @@ function App() {
         <Route path="/chat">
           {authCtx.isLoggedIn && <Chat />}
           {!authCtx.isLoggedIn && <Redirect to="/auth" />}
+        </Route>
+        <Route path="/registration/:token">
+          <RegisterUserForm/>
         </Route>
         <Route path="*">
           <Redirect to="/" />

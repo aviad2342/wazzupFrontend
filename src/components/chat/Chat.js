@@ -7,6 +7,8 @@ import './chat.scss';
 import AuthContext from '../../store/auth-context';
 import { useLazyQuery } from "@apollo/client";
 import { CHAT, CONTACT } from "../../queries/root.queries";
+import AddUserForm from "./add-user/AddUserForm";
+import { Fragment } from "react";
 // const SERVER = "http://127.0.0.1:8000";
 
 const chatIdGenerator = (phoneA, phoneB) => {
@@ -16,120 +18,26 @@ const chatIdGenerator = (phoneA, phoneB) => {
 const Chat = (props) => {
 
   const authCtx = useContext(AuthContext);
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedContact, setSelectedContact] = useState({_id: "000", phone: "0000", name: "select contact", avatar: "https://www.winhelponline.com/blog/wp-content/uploads/2017/12/user.png"});
-  const [chat, setChat] = useState(null);
-  // const [fetchChat, {data: chatData}] = useMutation(CHAT);
+  const [selectedContact, setSelectedContact] = useState(
+    {_id: "000", phone: "0000", name: "select contact", avatar: "https://www.winhelponline.com/blog/wp-content/uploads/2017/12/user.png"});
   const [fetchChat, {data: chatData}] = useLazyQuery(CHAT, {fetchPolicy: "cache-and-network"});
   const [fetchContact, {data: contactData}] = useLazyQuery(CONTACT);
+  const [displayAddUserForm, setDisplayAddUserForm] = useState(false);
 
-  console.log('chatData', chatData?.chat?.messages?.length);
-
-
-  const _fetchChat = (id) => {
-  //   setIsLoading(true);
-  //   if(id.length < 20) {
-  //     return;
-  //   }
-  //   let requestBody = { 
-  //     query: `
-  //     mutation {
-  //       chat(chatId:"${id}") {
-  //         _id
-  //         id
-  //         messages{
-  //           _id
-  //           from {
-  //             _id
-  //             phone
-  //             name
-  //             avatar
-  //           }
-  //           to {
-  //             _id
-  //             phone
-  //             name
-  //             avatar
-  //           }
-  //           date
-  //           body
-  //         }
-  //       }
-  //     }
-  //     `
-  //   };
-
-  //   fetch("http://localhost:8000/graphql", {
-  //     method: "POST",
-  //     body: JSON.stringify(requestBody),
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     }
-  //   }).then((res) => {
-  //       setIsLoading(false);
-
-  //       if (res.ok) {
-  //         return res.json();
-  //       } else {
-  //         return res.json().then((data) => {
-  //           let errorMessage = "Failed to fetch chat!";
-  //           throw new Error(errorMessage);
-  //         });
-  //       }
-  //     }).then((data) => {
-  //       setChat(data.data.chat)
-  //       // setMessages(chat.messages);
-  //     })
-  //     .catch((err) => {
-  //       console.log('chat ' + err.message);
-  //     });
+  const showAddUserFormHandler = () => {
+    setDisplayAddUserForm(true);
   };
 
-  const _fetchContact = (userPhone) => {
-    // let requestBody = {
-    //   query: `
-    //   mutation {
-    //     user(userPhone:"${userPhone}") {
-    //       _id
-    //       phone
-    //       name
-    //       avatar
-    //     }
-    //   }
-    //   `
-    // };
-
-    // fetch("http://localhost:8000/graphql", {
-    //   method: "POST",
-    //   body: JSON.stringify(requestBody),
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   }
-    // }).then((res) => {
-    //     setIsLoading(false);
-
-    //     if (res.ok) {
-    //       return res.json();
-    //     } else {
-    //       return res.json().then((data) => {
-    //         let errorMessage = "Failed to fetch contact!";
-    //         throw new Error(errorMessage);
-    //       });
-    //     }
-    //   }).then((data) => {
-    //     setSelectedContact(data.data.user)
-    //   })
-    //   .catch((err) => {
-    //     console.log('chat ' + err.message);
-    //   });
+  const hideAddUserFormHandler = () => {
+    setDisplayAddUserForm(false);
   };
+
 
 const logoutHandler= () => {
   authCtx.logout();
 }
 
 const addMessageHandler = (chatId) => {
-  // chat.messages = [...chat.messages, message];
   fetchChat({variables: {
     chatId: chatId
   }});
@@ -142,14 +50,11 @@ useEffect(() => {
 }, [contactData])
 
 const contactSelectedHandler = id => {
-  console.log('ajjs');
   const chatId = chatIdGenerator(authCtx.phone, id);
   if(chatId.length < 20) {
     return;
   }
   fetchContact({variables: { userPhone: id }});
-
-  console.log('TEST')
 
   fetchChat({
     variables: {
@@ -160,10 +65,13 @@ const contactSelectedHandler = id => {
 
   return (
     <div className="chat-app">
+      <Fragment>
+      {displayAddUserForm && <AddUserForm onClose={hideAddUserFormHandler}/>}
         <div className="contacts-list">
             <ContactsListHeader onLogout={logoutHandler} />
-            <ContactsList onSelect={contactSelectedHandler} />
+            <ContactsList onSelect={contactSelectedHandler} onAddContact={showAddUserFormHandler}/>
         </div>
+        </Fragment>
         <div className="messages-section">
         <Header contact={selectedContact}/>
         {chatData?.chat && <Conversation conversation={chatData?.chat} contact={selectedContact.phone} onAddMessage={addMessageHandler}/>}

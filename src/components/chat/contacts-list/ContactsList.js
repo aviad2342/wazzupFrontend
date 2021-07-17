@@ -1,65 +1,30 @@
-
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import Contact from "./contact/Contact";
 import AuthContext from "../../../store/auth-context";
+import { CONTACTS } from "../../../queries/root.queries";
+import { FaUserPlus } from 'react-icons/fa';
 
 const ContactsList = (props) => {
-
   const authCtx = useContext(AuthContext);
   const [contactsList, setContactsList] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [fetchContacts, { data: contactsData }] = useLazyQuery(CONTACTS);
+  const { loading, data } = useQuery(CONTACTS);
 
-  const fetchContactsHandler = useCallback(async () => {
-    setIsLoading(true);
-    let content = <p>No contacts Found.</p>;
-    let requestBody = {
-      query: `
-      query {
-        users {
-          _id
-          phone
-          name
-          avatar
-        }
-      }
-      `
-    };
-  
-    await fetch("http://localhost:8000/graphql", {
-      method: "POST",
-      body: JSON.stringify(requestBody),
-      headers: {
-        "Content-Type": "application/json",
-      }
-    }).then((res) => {
-      content = <p>Loading...</p>;
-        setIsLoading(false);
-        if (res.ok) {
-          return res.json();
-        } else {
-          return res.json().then((data) => {
-            let errorMessage = "Failed to fetch Contacts!";
-            content = <p>{errorMessage}</p>;
-            throw new Error(errorMessage);
-          });
-        }
-      }).then((data) => {
-        setContactsList(data.data.users.filter(c => c.phone !== authCtx.phone));
-      })
-      .catch((err) => {
-        console.log('contacts ' + err.message);
-        // alert('contacts ' + err.message);
-      });
-  }, []);
+  const loadContects = () => {
+    fetchContacts();
+    if (!loading) {
+      setContactsList(data.users.filter((c) => c.phone !== authCtx.phone));
+    }
+  };
 
   useEffect(() => {
-    fetchContactsHandler();
-  }, [fetchContactsHandler]);
+    loadContects();
+  }, [data]);
 
   const contactSelectedHandler = async (id) => {
     props.onSelect(id);
   };
-
 
   return (
     <div>
@@ -74,6 +39,14 @@ const ContactsList = (props) => {
           lastMessage={contact.lastMessage}
         />
       ))}
+      <div className="add-contact-div">
+        <button className="add-contact-btn" onClick={props.onAddContact}>
+          <span>
+          <FaUserPlus />
+          </span>
+           Add Contact
+        </button>
+      </div>
     </div>
   );
 };

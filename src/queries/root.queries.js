@@ -30,9 +30,20 @@ export const CONTACT = gql`
 query user($userPhone: String!) {
     user(userPhone: $userPhone) {
         _id
-          phone
-          name
-          avatar
+        phone
+        name
+        avatar
+    }
+ }
+`;
+
+export const CONTACTS = gql`
+query users {
+     users {
+        _id
+        phone
+        name
+        avatar
     }
  }
 `;

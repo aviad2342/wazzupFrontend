@@ -11,7 +11,7 @@ const ContactsListHeader = (props) => {
       <header className={classes.header}>
       <img className={classes['avatar-image']} src={authCtx.avatar} alt='' />
        <div className='contact-name'>{authCtx.name}</div>
-        <button className={classes['logout-btn']} onClick={props.onLogout}>Logout</button>
+        <button className={classes['logout-btn']} onClick={props.onLogout}>logout</button>
       </header>
     </Fragment>
   );

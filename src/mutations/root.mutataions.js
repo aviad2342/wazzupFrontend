@@ -20,4 +20,15 @@ mutation newMessage($chatId: ID!, $from: String!, $to: String!, $date: String!, 
         _id
     }
 }
-`
+`;
+
+export const NEW_USER = gql`
+mutation createUser($phone: String!, $name: String!, $avatar: String!) {
+  createUser(userInput:{phone: $phone, name: $name, avatar: $avatar}) {
+    _id
+  phone
+  name
+  avatar
+    }
+}
+`;
